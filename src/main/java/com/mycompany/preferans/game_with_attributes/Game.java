@@ -1,4 +1,4 @@
-package com.mycompany.preferans;
+package com.mycompany.preferans.game_with_attributes;
 
 import com.mycompany.preferans.subjects.Player;
 
@@ -12,7 +12,7 @@ public class Game {
     private int partiesToPlay;
     private int playedParties;
 
-    List<Party> parties;
+    private List<Party> parties;
 
     public Game(int partiesToPlay, Set<Player> players) {
         this.players = players;
@@ -29,5 +29,29 @@ public class Game {
 
             playersAndScores.put(player, scores);
         }
+    }
+
+    public int getPartiesToPlay() {
+        return partiesToPlay;
+    }
+
+    public int getPlayedParties() {
+        return playedParties;
+    }
+
+    public Map<Player, List<Scores>> getPlayersAndScores() {
+        return playersAndScores;
+    }
+
+    public Set<Player> getPlayers() {
+        return players;
+    }
+
+    public void addParty(Party party){
+        parties.add(party);
+    }
+
+    public void setPlayedParties(int playedParties){
+        this.playedParties = playedParties;
     }
 }
