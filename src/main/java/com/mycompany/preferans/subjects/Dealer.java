@@ -1,6 +1,5 @@
 package com.mycompany.preferans.subjects;
 
-import com.mycompany.preferans.Main;
 import com.mycompany.preferans.game_with_attributes.Game;
 import com.mycompany.preferans.game_with_attributes.Party;
 import com.mycompany.preferans.game_with_attributes.Scores;
@@ -26,18 +25,20 @@ public class Dealer {
         this.deck = deck;
     }
 
-    public void playGame(Set<Player> players, int partiesToPlay) {
+    public Game playGame(Set<Player> players, int partiesToPlay) {
         Game game = new Game(partiesToPlay, players);
+
         log.info("\n\nGame has started!");
 
         int positionOfFirstPlayer = 0;
-        int numberOfParty = 0;
+        int numberOfDealing = 0;
         List<Player> listOfPlayers = new ArrayList<>(players);
 
         while (game.getPartiesToPlay() != game.getPlayedParties()) {
-            giveCardsToPlayers(players);
+            numberOfDealing++;
 
-            numberOfParty++;
+            log.info("\n\nDealing " + numberOfDealing + " has started.");
+            giveCardsToPlayers(players);
 
             List<Card> cardsBuyIn = deck.getCards()
                     .subList(players.size() * NUMBER_OF_CARDS_IN_BEGINNING, deck.getCards().size());
@@ -59,7 +60,6 @@ public class Dealer {
             positionOfFirstPlayer %= NUMBER_OF_PLAYERS;
 
             Party party = new Party(players, cardsBuyIn, trade, trump);
-            log.info("Party " + numberOfParty +" has started.");
             party.initParty(players);
 
             game.addParty(party);
@@ -73,9 +73,14 @@ public class Dealer {
 
             schemeOfGame.changeScores(game, party, playerScoresMap);
 
-            log.info(playerScoresMap);
+            log.info("Scores:");
+
+            for (Player player : players) {
+                log.info(player + " has got scores:\n" + playerScoresMap.get(player));
+            }
         }
 
+        return game;
     }
 
     private Scores createScores(Set<Player> players, Player playerWhoNeedsScores) {
@@ -90,7 +95,6 @@ public class Dealer {
 
         return scores;
     }
-
 
     private void giveCardsToPlayers(Set<Player> players) {
         Collections.shuffle(deck.getCards());

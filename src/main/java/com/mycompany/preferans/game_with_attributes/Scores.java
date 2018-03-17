@@ -37,13 +37,13 @@ public class Scores {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append("pool points: ").append(poolPoints).append("\n");
+        s.append("      pool points: ").append(poolPoints).append("\n");
 
         for (Player player : whistPoints.keySet()) {
-            s.append("whists on ").append(player).append(" ").append(whistPoints.get(player)).append("\n");
+            s.append("      whists on ").append(player).append(" ").append(whistPoints.get(player)).append("\n");
         }
 
-        s.append("dump points: ").append(dumpPoints);
+        s.append("      dump points: ").append(dumpPoints);
 
         return s.toString();
     }

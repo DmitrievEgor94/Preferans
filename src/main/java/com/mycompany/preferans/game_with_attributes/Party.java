@@ -2,9 +2,9 @@ package com.mycompany.preferans.game_with_attributes;
 
 import com.mycompany.preferans.game_with_attributes.card_and_deck.Card;
 import com.mycompany.preferans.game_with_attributes.trade_offers_and_trade.Trade;
-import com.mycompany.preferans.subjects.Dealer;
 import com.mycompany.preferans.subjects.Player;
 import org.apache.log4j.Logger;
+import sun.rmi.runtime.Log;
 
 import java.util.*;
 
@@ -62,11 +62,21 @@ public class Party {
             firstPlayer = player;
         }
 
+        log.info("Max trade offer is " + trade.getMaxTradeOffer() +".");
+
         cardsFirstPlayerReturned = firstPlayer.changeCardsBuyIn(cardsBuyIn, this);
         log.info(firstPlayer + " has returned in buy-in " +cardsFirstPlayerReturned);
 
+        log.info(firstPlayer + " has changed trade offer on " + trade.getMaxTradeOffer());
+
+        for (Player player : players) {
+            player.setActiveTradeOffer(null);
+        }
+
         while (firstPlayer.getCardsOnHand().size() != 0) {
             RecordOfTrick recordOfTrick = new RecordOfTrick();
+
+            recordOfTrick.setFirstPlayer(firstPlayer);
 
             List<Card> cardsInTrick = new ArrayList<>();
 
@@ -89,7 +99,7 @@ public class Party {
             }
 
             Player playerWithBiggestCard = recordOfTrick.findPlayerWithBiggestCard(trump, cardsInTrick.get(0));
-            log.info(playerWithBiggestCard + " has got " + "trick.");
+            log.info(playerWithBiggestCard + " has got " + "trick.\n");
 
             if (!playerAndNumberOfTricks.keySet().contains(playerWithBiggestCard)) {
                 playerAndNumberOfTricks.put(playerWithBiggestCard, 1);
@@ -97,6 +107,8 @@ public class Party {
                 Integer numberOfTricks = playerAndNumberOfTricks.get(playerWithBiggestCard) + 1;
                 playerAndNumberOfTricks.put(playerWithBiggestCard, numberOfTricks);
             }
+
+            recordOfTrick.setWinner(playerWithBiggestCard);
 
             tricks.add(recordOfTrick);
 
@@ -106,7 +118,22 @@ public class Party {
         for (Player player : players) {
             log.info(player + " has got " + playerAndNumberOfTricks.get(player) +" tricks.");
         }
+    }
 
+    public List<RecordOfTrick> getTricks() {
+        return tricks;
+    }
+
+    public List<Card> getCardsBuyIn() {
+        return cardsBuyIn;
+    }
+
+    public List<Card> getCardsFirstPlayerReturned() {
+        return cardsFirstPlayerReturned;
+    }
+
+    public Map<Player, List<Card>> getPlayerAndCardsInBeginning() {
+        return playerAndCardsInBeginning;
     }
 
     public Trade getTrade() {
@@ -119,14 +146,33 @@ public class Party {
 
     public class RecordOfTrick {
 
-        Map<Player, Card> trick;
+        private Map<Player, Card> trick;
+        private Player winner;
+        private Player firstPlayer;
 
-        public RecordOfTrick() {
+        RecordOfTrick() {
             trick = new HashMap<>();
         }
 
         public Map<Player, Card> getTrick() {
             return trick;
+        }
+
+        public Player getWinner() {
+
+            return winner;
+        }
+
+        public Player getFirstPlayer() {
+            return firstPlayer;
+        }
+
+        public void setFirstPlayer(Player firstPlayer) {
+            this.firstPlayer = firstPlayer;
+        }
+
+        public void setWinner(Player winner) {
+            this.winner = winner;
         }
 
         Player findPlayerWithBiggestCard(Card trump, Card firstCard) {
@@ -159,5 +205,7 @@ public class Party {
                     .get()
                     .getKey();
         }
+
+
     }
 }

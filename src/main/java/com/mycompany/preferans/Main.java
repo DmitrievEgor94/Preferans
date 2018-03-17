@@ -1,5 +1,7 @@
 package com.mycompany.preferans;
 
+import com.mycompany.preferans.api_functions.ClassWithApiFunctions;
+import com.mycompany.preferans.game_with_attributes.Game;
 import com.mycompany.preferans.game_with_attributes.card_and_deck.Deck;
 import com.mycompany.preferans.game_with_attributes.schemes.Leningrad;
 import com.mycompany.preferans.game_with_attributes.schemes.Rostov;
@@ -9,9 +11,7 @@ import com.mycompany.preferans.subjects.Dealer;
 import com.mycompany.preferans.subjects.Player;
 import org.apache.log4j.Logger;
 
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 public class Main {
     private static final int NUMBER_OF_PLAYERS = 3;
@@ -48,7 +48,20 @@ public class Main {
 
         Dealer dealer = new Dealer(scheme, deck);
 
-        dealer.playGame(players, partiesToPlay);
+        Game game = dealer.playGame(players, partiesToPlay);
+
+        ClassWithApiFunctions classWithApiFunctions = new ClassWithApiFunctions(game);
+
+        List<Player> listOfPlayers = new ArrayList<>(players);
+
+        classWithApiFunctions.api1(1, "api1.txt",false);
+        classWithApiFunctions.api2(1, "api2.txt", false);
+        classWithApiFunctions.api3(1, "api3.txt", false);
+        classWithApiFunctions.api4(1, "api4.txt", false);
+        classWithApiFunctions.api5(1, "api5.txt", false);
+        classWithApiFunctions.api6(1, "api6.txt", false);
+        classWithApiFunctions.api7(1,"api7.txt", listOfPlayers.get(0),false);
+        classWithApiFunctions.api10(10, "api10.txt",false);
     }
 
     private static Scheme getScheme(String schemeName) {

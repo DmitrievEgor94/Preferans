@@ -51,15 +51,42 @@ public class Card implements Comparable<Card> {
     }
 
     public enum Suit {
-        SPADE, CLUBS, DIAMONDS, HEARTS, NO_SUITS
+        SPADES('\u2660'),
+        CLUBS('\u2663'),
+        DIAMONDS('\u2666'),
+        HEARTS('\u2665'),
+        NO_SUITS('N');
+
+        private char symbolInUnicode;
+
+        Suit(char symbolInUnicode) {
+            this.symbolInUnicode = symbolInUnicode;
+        }
+
+        @Override
+        public String toString() {
+            return String.valueOf(symbolInUnicode);
+        }
     }
 
     public enum Rank {
-        SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE
+        SIX("6"), SEVEN("7"), EIGHT("8"), NINE("9"), TEN("10"), JACK("J"), QUEEN("Q"), KING("K"), ACE("A");
+
+        private String name;
+
+        Rank(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
     @Override
     public String toString() {
-        return suit + " " + rank;
+        return rank.toString() + suit;
     }
+
 }

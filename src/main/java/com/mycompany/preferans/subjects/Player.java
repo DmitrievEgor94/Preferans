@@ -5,6 +5,7 @@ import com.mycompany.preferans.game_with_attributes.Party;
 import com.mycompany.preferans.game_with_attributes.StatusInParty;
 import com.mycompany.preferans.game_with_attributes.card_and_deck.Card;
 import com.mycompany.preferans.game_with_attributes.trade_offers_and_trade.TradeOffer;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ public class Player {
     private TradeOffer activeTradeOffer;
 
     public Player(String name) {
+        activeTradeOffer = null;
         this.name = name;
     }
 
@@ -84,7 +86,6 @@ public class Player {
     }
 
     public List<Card> changeCardsBuyIn(List<Card> buyIn, Party party) {
-
         if (party.getTrump() != null) {
             cardsOnHand.addAll(buyIn);
 
@@ -92,6 +93,7 @@ public class Player {
 
             if (newTradeOffer.getCard() != null) {
                 party.setTrump(newTradeOffer.getCard());
+                party.getTrade().setMaxTradeOffer(newTradeOffer);
 
                 List<Card> leastCards = chooseTheLeastCards(newTradeOffer.getCard());
 
@@ -153,7 +155,8 @@ public class Player {
         TradeOffer tradeOffer = new TradeOffer(TradeOffer.TradeOfferType.SKIP);
 
         if (possibleNumberOfTakenTricks >= MIN_NUMBER_OF_TRICKS_FOR_OFFER_PLAYER) {
-            Card card = new Card(suitWithMaxNumberOfCards, Card.Rank.values()[possibleNumberOfTakenTricks - 6]);
+            Card card = new Card(suitWithMaxNumberOfCards, Card.Rank.values()[possibleNumberOfTakenTricks -
+                    MIN_NUMBER_OF_TRICKS_FOR_OFFER_PLAYER]);
 
             tradeOffer.setCard(card);
             tradeOffer.setTradeOfferType(TradeOffer.TradeOfferType.PLAY);
@@ -164,17 +167,15 @@ public class Player {
         }
 
         if (maxTradeOffer.compareTo(activeTradeOffer) == 0) {
-            return tradeOffer;
+            return maxTradeOffer;
         }
 
         if (tradeOffer.compareTo(maxTradeOffer) > 0) {
-            activeTradeOffer = tradeOffer;
-            return tradeOffer;
+            activeTradeOffer = new TradeOffer(tradeOffer);
+            return new TradeOffer(tradeOffer);
         }
 
-        tradeOffer.setTradeOfferType(TradeOffer.TradeOfferType.SKIP);
-
-        return tradeOffer;
+        return new TradeOffer(TradeOffer.TradeOfferType.SKIP);
     }
 
     private Map<Card.Suit, List<Card>> getCardsOfSuits(List<Card> givenCards) {
@@ -239,6 +240,14 @@ public class Player {
             activeStatus = StatusInParty.SKIPPER;
             return StatusInParty.SKIPPER;
         }
+    }
+
+    public void setActiveTradeOffer(TradeOffer activeTradeOffer) {
+        this.activeTradeOffer = activeTradeOffer;
+    }
+
+    public TradeOffer getActiveTradeOffer() {
+        return activeTradeOffer;
     }
 
     public List<Card> getCardsOnHand() {
