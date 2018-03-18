@@ -54,15 +54,21 @@ public class Main {
 
         List<Player> listOfPlayers = new ArrayList<>(players);
 
-        classWithApiFunctions.api1(1, "api1.txt", false);
-        classWithApiFunctions.api2(1, "api2.txt", false);
-        classWithApiFunctions.api3(1, "api3.txt", false);
-        classWithApiFunctions.api4(1, "api4.txt", false);
-        classWithApiFunctions.api5(1, "api5.txt", false);
-        classWithApiFunctions.api6(1, "api6.txt", false);
-        classWithApiFunctions.api7(1, "api7.txt", listOfPlayers.get(0), false);
-        classWithApiFunctions.api9(100, "api9.txt", listOfPlayers.get(0), false);
-        classWithApiFunctions.api10(10, "api10.txt", false);
+        classWithApiFunctions.api1(2, "api1_2.txt", false);
+        classWithApiFunctions.api1(5, "api1_5.txt", false);
+        classWithApiFunctions.api2(4, "api2_4.txt", false);
+        classWithApiFunctions.api3(4, "api3_3.txt", false);
+        classWithApiFunctions.api4(7, "api4_7.txt", false);
+        classWithApiFunctions.api5(6, "api5_6.txt", false);
+        classWithApiFunctions.api7(8, "api7_8.txt", listOfPlayers.get(0), false);
+        classWithApiFunctions.api8(10, "api8_10.txt", listOfPlayers.get(1), false);
+        classWithApiFunctions.api9(10, "api9_10.txt", listOfPlayers.get(2), false);
+        classWithApiFunctions.api10(12, "api10.txt", false);
+
+        for (int i = 1; i <= 12; i++) {
+            String nameOfFile = "api6_" + i + ".txt";
+            classWithApiFunctions.api6(i, nameOfFile, false);
+        }
     }
 
     private static Scheme getScheme(String schemeName) {
