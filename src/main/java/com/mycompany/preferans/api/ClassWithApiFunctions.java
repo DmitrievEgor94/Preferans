@@ -46,7 +46,7 @@ public class ClassWithApiFunctions {
             printWriter.println("Buy-in is " + party.getCardsBuyIn() + ".");
             printWriter.println("First trader is " + party.getTrade().getPersonWhoStartsTrading() + ".");
 
-            printWriter.println("Person who first gives deck is " + party.getPlayerWhoFirstMakesMove() + ".");
+            printWriter.println("Person who first gives card is " + party.getPlayerWhoFirstMakesMove() + ".");
 
         } catch (FileNotFoundException e) {
             log.error(CREATING_FILE_IS_IMPOSSIBLE + fileName);
@@ -94,7 +94,7 @@ public class ClassWithApiFunctions {
 
             for (Map.Entry<Player, StatusInParty> playerStatusInPartyEntry : playerAndStatus.entrySet()) {
                 printWriter.println(playerStatusInPartyEntry.getKey() + " has got status "
-                        + playerAndStatus.get(playerStatusInPartyEntry.getValue()) + ".");
+                        + playerStatusInPartyEntry.getValue() + ".");
             }
 
         } catch (FileNotFoundException e) {
@@ -112,6 +112,10 @@ public class ClassWithApiFunctions {
             List<Party.RecordOfTrick> records = party.getTricks();
 
             printWriter.println("Trump is " + party.getTrump() + ".");
+
+            if (records.isEmpty()){
+                printWriter.println(party.getPlayerInParty()+" has won this game without play!");
+            }
 
             for (Party.RecordOfTrick record : records) {
                 Map<Player, Card> trick = record.getTrick();

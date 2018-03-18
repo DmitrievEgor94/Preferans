@@ -66,7 +66,7 @@ public interface Scheme {
                                 }
                             }
 
-                            needTricksToTake = Math.max(2 - party.getTrump().getRank().ordinal(), 0) * 2 +
+                            needTricksToTake = Math.max(2 - party.getTrump().getRank().ordinal(), 0) * 2 -
                                     party.getPlayerAndNumberOfTricks().get(skipper);
                         } else {
                             needTricksToTake = Math.max(2 - party.getTrump().getRank().ordinal(), 0);

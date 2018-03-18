@@ -90,6 +90,7 @@ public class Trade {
 
         if (whoFirstGivesCard != null) {
             chooseStatusOfPlayers(players, buyIn, whoFirstGivesCard);
+
         }
         return whoFirstGivesCard;
     }
@@ -108,7 +109,6 @@ public class Trade {
                 }
             }
         } else {
-
             List<Card> cardsFirstPlayerReturned = whoFirstGivesCard.changeCardsBuyIn();
 
             maxTradeOffer = whoFirstGivesCard.getActiveTradeOffer();
