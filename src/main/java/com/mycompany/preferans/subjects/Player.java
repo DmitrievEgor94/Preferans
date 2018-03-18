@@ -1,11 +1,9 @@
 package com.mycompany.preferans.subjects;
 
 
-import com.mycompany.preferans.game_with_attributes.Party;
-import com.mycompany.preferans.game_with_attributes.StatusInParty;
-import com.mycompany.preferans.game_with_attributes.card_and_deck.Card;
-import com.mycompany.preferans.game_with_attributes.trade_offers_and_trade.TradeOffer;
-import org.apache.log4j.Logger;
+import com.mycompany.preferans.game.StatusInParty;
+import com.mycompany.preferans.game.deck.Card;
+import com.mycompany.preferans.game.trade.TradeOffer;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,95 +19,152 @@ public class Player {
     private StatusInParty activeStatus;
     private TradeOffer activeTradeOffer;
 
+    private List<Card> buyInOfActiveParty;
+
     public Player(String name) {
         activeTradeOffer = null;
         this.name = name;
     }
 
-    public Card giveCard(Card trump, List<Card> cardsInTrick, Party party) {
+    public Card giveCard(Card trump, List<Card> cardsInTrick) {
+        Card card;
+
+        if (trump != null) {
+            card = chooseMaxCardForTrick(trump, cardsInTrick);
+        } else {
+            card = chooseMinCardForTrick(cardsInTrick);
+        }
+
+        cardsOnHand.remove(card);
+
+        return card;
+    }
+
+    public Map<Player, Card> giveCardOpenGame(Card trump, List<Card> cardsInTrick, Player playerWithStatusSkip) {
+        Map<Player, Card> playerCardMap = new HashMap<>();
+
+        getMaxCard(trump, cardsInTrick, playerWithStatusSkip, playerCardMap);
+
+        Player player = playerCardMap.keySet().iterator().next();
+
+        player.getCardsOnHand().remove(playerCardMap.get(player));
+
+        if (player == this) {
+            Card minCard = playerWithStatusSkip.chooseMinCardForTrick(cardsInTrick);
+
+            playerCardMap.put(playerWithStatusSkip, minCard);
+
+            playerWithStatusSkip.cardsOnHand.remove(minCard);
+        } else {
+            Card minCard = chooseMinCardForTrick(cardsInTrick);
+
+            playerCardMap.put(this, minCard);
+
+            cardsOnHand.remove(minCard);
+        }
+
+        return playerCardMap;
+    }
+
+    private void getMaxCard(Card trump, List<Card> cardsInTrick,
+                            Player playerWithStatusSkip, Map<Player, Card> playerAndCard) {
+        Card maxCard = chooseMaxCardForTrick(trump, cardsInTrick);
+        Card maxCardSkipPlayer = playerWithStatusSkip.chooseMaxCardForTrick(trump, cardsInTrick);
+
+        if (maxCard.getSuit() == trump.getSuit() && (maxCardSkipPlayer.getSuit() != trump.getSuit())) {
+            playerAndCard.put(this, maxCard);
+            return;
+        }
+
+        if (maxCard.getSuit() != trump.getSuit() && (maxCardSkipPlayer.getSuit() == trump.getSuit())) {
+            playerAndCard.put(playerWithStatusSkip, maxCardSkipPlayer);
+            return;
+        }
+
+        if (maxCard.getSuit() == maxCardSkipPlayer.getSuit()) {
+            if (maxCard.compareTo(maxCardSkipPlayer) > 0) {
+                playerAndCard.put(this, maxCard);
+            } else {
+                playerAndCard.put(playerWithStatusSkip, maxCardSkipPlayer);
+            }
+
+        } else {
+            if (maxCard.compareTo(maxCardSkipPlayer) > 0) {
+                playerAndCard.put(this, maxCard);
+            } else {
+                playerAndCard.put(playerWithStatusSkip, maxCardSkipPlayer);
+            }
+        }
+
+    }
+
+    private Card chooseMinCardForTrick(List<Card> cardsInTrick) {
+        Card minCard = cardsOnHand.stream()
+                .min(Comparator.comparing(Card::getRank)).get();
+
+        if (cardsInTrick.isEmpty()) {
+            return minCard;
+        } else {
+            Card firstCard = cardsInTrick.get(0);
+
+            Card minCardOfFirstSuit = cardsOnHand.stream()
+                    .filter(a -> (a.getRank().equals(firstCard.getRank())))
+                    .min(Card::compareTo)
+                    .orElse(null);
+
+            if (minCardOfFirstSuit == null) {
+                return minCard;
+            }
+
+            return minCardOfFirstSuit;
+        }
+    }
+
+    private Card chooseMaxCardForTrick(Card trump, List<Card> cardsInTrick) {
         Card maxCard = cardsOnHand.stream()
-                .max(Comparator.comparing(Card::getRank)).get();
+                .max(Comparator.comparing(Card::getRank))
+                .get();
 
         Card minCard = cardsOnHand.stream()
                 .min(Comparator.comparing(Card::getRank)).get();
 
-        if (trump != null) {
-            if (cardsInTrick.isEmpty()) {
-                cardsOnHand.remove(maxCard);
-                return maxCard;
-            } else {
-                Card firstCard = cardsInTrick.get(0);
+        if (cardsInTrick.isEmpty()) {
+            return maxCard;
+        } else {
+            Card firstCard = cardsInTrick.get(0);
 
-                Card maxCardOfFirstSuit = cardsOnHand.stream()
-                        .filter(a -> (a.getRank().equals(firstCard.getRank())))
+            Card maxCardOfFirstSuit = cardsOnHand.stream()
+                    .filter(a -> (a.getRank().equals(firstCard.getRank())))
+                    .max(Card::compareTo)
+                    .orElse(null);
+
+            if (maxCardOfFirstSuit == null) {
+                Card maxCardOfTrumpSuit = cardsOnHand.stream()
+                        .filter(a -> (a.getRank().equals(trump.getRank())))
                         .max(Card::compareTo)
                         .orElse(null);
 
-                if (maxCardOfFirstSuit == null) {
-                    Card maxCardOfTrumpSuit = cardsOnHand.stream()
-                            .filter(a -> (a.getRank().equals(trump.getRank())))
-                            .max(Card::compareTo)
-                            .orElse(null);
-
-                    if (maxCardOfTrumpSuit == null) {
-                        cardsOnHand.remove(minCard);
-                        return minCard;
-                    }
-                    cardsOnHand.remove(maxCardOfTrumpSuit);
-                    return maxCardOfTrumpSuit;
-                }
-                cardsOnHand.remove(maxCardOfFirstSuit);
-                return maxCardOfFirstSuit;
-            }
-        } else {
-            if (cardsInTrick.isEmpty()) {
-                cardsOnHand.remove(minCard);
-                return minCard;
-            } else {
-                Card firstCard = cardsInTrick.get(0);
-
-                Card minCardOfFirstSuit = cardsOnHand.stream()
-                        .filter(a -> (a.getRank().equals(firstCard.getRank())))
-                        .min(Card::compareTo)
-                        .orElse(null);
-
-                if (minCardOfFirstSuit == null) {
-                    cardsOnHand.remove(minCard);
+                if (maxCardOfTrumpSuit == null) {
                     return minCard;
                 }
-
-                cardsOnHand.remove(minCardOfFirstSuit);
-                return minCardOfFirstSuit;
+                return maxCardOfTrumpSuit;
             }
-
+            return maxCardOfFirstSuit;
         }
     }
 
-    public List<Card> changeCardsBuyIn(List<Card> buyIn, Party party) {
-        if (party.getTrump() != null) {
-            cardsOnHand.addAll(buyIn);
+    public List<Card> changeCardsBuyIn() {
+        cardsOnHand.addAll(buyInOfActiveParty);
 
-            TradeOffer newTradeOffer = chooseTradeOffer(new TradeOffer(TradeOffer.TradeOfferType.SKIP));
+        chooseTradeOffer(activeTradeOffer);
 
-            if (newTradeOffer.getCard() != null) {
-                party.setTrump(newTradeOffer.getCard());
-                party.getTrade().setMaxTradeOffer(newTradeOffer);
+        List<Card> leastCards = chooseTheLeastCards(activeTradeOffer.getCard());
 
-                List<Card> leastCards = chooseTheLeastCards(newTradeOffer.getCard());
+        cardsOnHand = cardsOnHand.stream()
+                .filter(a -> !leastCards.contains(a))
+                .collect(Collectors.toList());
 
-                cardsOnHand = cardsOnHand.stream()
-                        .filter(a -> !leastCards.contains(a))
-                        .collect(Collectors.toList());
-
-                return leastCards;
-            } else {
-                cardsOnHand = cardsOnHand.stream()
-                        .filter(a -> !buyIn.contains(a))
-                        .collect(Collectors.toList());
-            }
-        }
-
-        return new ArrayList<>();
+        return leastCards;
     }
 
     private List<Card> chooseTheLeastCards(Card trump) {
@@ -125,7 +180,7 @@ public class Player {
     public TradeOffer chooseTradeOffer(TradeOffer maxTradeOffer) {
         Set<Card> aces = new HashSet<>();
         Set<Card> kings = new HashSet<>();
-        Map<Card.Suit, List<Card>> cardsOfDifSuits = getCardsOfSuits(cardsOnHand);
+        Map<Card.Suit, List<Card>> cardsOfDifSuits = getCardsOfSuits();
 
         for (Card card : cardsOnHand) {
             if (card.getRank() == Card.Rank.ACE) {
@@ -166,19 +221,20 @@ public class Player {
             tradeOffer.setTradeOfferType(TradeOffer.TradeOfferType.GET_NOTHING);
         }
 
-        if (maxTradeOffer.compareTo(activeTradeOffer) == 0) {
-            return maxTradeOffer;
-        }
-
         if (tradeOffer.compareTo(maxTradeOffer) > 0) {
             activeTradeOffer = new TradeOffer(tradeOffer);
             return new TradeOffer(tradeOffer);
         }
 
-        return new TradeOffer(TradeOffer.TradeOfferType.SKIP);
+        if (maxTradeOffer.compareTo(activeTradeOffer) == 0) {
+            return maxTradeOffer;
+        }
+
+        activeTradeOffer = new TradeOffer(TradeOffer.TradeOfferType.SKIP);
+        return activeTradeOffer;
     }
 
-    private Map<Card.Suit, List<Card>> getCardsOfSuits(List<Card> givenCards) {
+    private Map<Card.Suit, List<Card>> getCardsOfSuits() {
         Map<Card.Suit, List<Card>> cardsOfDifSuits = new HashMap<>();
 
         for (Card card : cardsOnHand) {
@@ -236,25 +292,35 @@ public class Player {
         if (possibleNumberOfTricks > MIN_NUMBER_OF_TRICKS_FOR_WHIST_PLAY) {
             activeStatus = StatusInParty.WHIST;
             return StatusInParty.WHIST;
-        } else {
-            activeStatus = StatusInParty.SKIPPER;
-            return StatusInParty.SKIPPER;
         }
+
+        activeStatus = StatusInParty.SKIPPER;
+        return StatusInParty.SKIPPER;
+
     }
 
-    public void setActiveTradeOffer(TradeOffer activeTradeOffer) {
-        this.activeTradeOffer = activeTradeOffer;
+    public boolean chooseIsGameIsOpened() {
+        Random random = new Random();
+        return random.nextBoolean();
+    }
+
+    public void setBuyInOfActiveParty(List<Card> buyInOfActiveParty) {
+        this.buyInOfActiveParty = buyInOfActiveParty;
     }
 
     public TradeOffer getActiveTradeOffer() {
         return activeTradeOffer;
     }
 
+    void setActiveTradeOffer(TradeOffer activeTradeOffer) {
+        this.activeTradeOffer = activeTradeOffer;
+    }
+
     public List<Card> getCardsOnHand() {
         return cardsOnHand;
     }
 
-    public void setCardsOnHand(List<Card> cardsOnHand) {
+    void setCardsOnHand(List<Card> cardsOnHand) {
         this.cardsOnHand = cardsOnHand;
     }
 
@@ -274,4 +340,5 @@ public class Player {
     public String toString() {
         return name;
     }
+
 }

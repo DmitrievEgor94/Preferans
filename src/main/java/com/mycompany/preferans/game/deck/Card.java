@@ -1,4 +1,4 @@
-package com.mycompany.preferans.game_with_attributes.card_and_deck;
+package com.mycompany.preferans.game.deck;
 
 import java.util.Objects;
 
@@ -31,23 +31,33 @@ public class Card implements Comparable<Card> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == this) {
+    public boolean equals(Object obj) {
+        if (obj == this) {
             return true;
         }
 
-        if (o == null) {
+        if (obj == null) {
             return false;
         }
 
-        if (getClass() != o.getClass()) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
 
-        Card card = (Card) o;
+        Card card = (Card) obj;
 
         return Objects.equals(card.rank, rank) &&
                 Objects.equals(card.suit, suit);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(suit, rank);
+    }
+
+    @Override
+    public String toString() {
+        return rank.toString() + suit;
     }
 
     public enum Suit {
@@ -82,11 +92,6 @@ public class Card implements Comparable<Card> {
         public String toString() {
             return name;
         }
-    }
-
-    @Override
-    public String toString() {
-        return rank.toString() + suit;
     }
 
 }

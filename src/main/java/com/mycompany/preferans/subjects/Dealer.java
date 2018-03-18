@@ -1,12 +1,13 @@
 package com.mycompany.preferans.subjects;
 
-import com.mycompany.preferans.game_with_attributes.Game;
-import com.mycompany.preferans.game_with_attributes.Party;
-import com.mycompany.preferans.game_with_attributes.Scores;
-import com.mycompany.preferans.game_with_attributes.card_and_deck.Card;
-import com.mycompany.preferans.game_with_attributes.card_and_deck.Deck;
-import com.mycompany.preferans.game_with_attributes.schemes.Scheme;
-import com.mycompany.preferans.game_with_attributes.trade_offers_and_trade.Trade;
+import com.mycompany.preferans.game.Game;
+import com.mycompany.preferans.game.Party;
+import com.mycompany.preferans.game.Scores;
+import com.mycompany.preferans.game.StatusInParty;
+import com.mycompany.preferans.game.deck.Card;
+import com.mycompany.preferans.game.deck.Deck;
+import com.mycompany.preferans.game.schemes.Scheme;
+import com.mycompany.preferans.game.trade.Trade;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -46,24 +47,22 @@ public class Dealer {
 
             Trade trade = new Trade();
 
-            Card trump = null;
-
             log.info("Trade has started.");
-            Trade.RecordOfTrading playerWithBiggestOffer =
-                    trade.initTrade(players, listOfPlayers.get(positionOfFirstPlayer));
-
-            if (playerWithBiggestOffer != null) {
-                trump = playerWithBiggestOffer.getTradeOffer().getCard();
-            }
+            Player playerWithBiggestOffer =
+                    trade.initTrade(players, listOfPlayers.get(positionOfFirstPlayer), cardsBuyIn);
 
             positionOfFirstPlayer++;
             positionOfFirstPlayer %= NUMBER_OF_PLAYERS;
 
-            Party party = new Party(players, cardsBuyIn, trade, trump);
-            party.initParty(players);
+            Party party = new Party(players, cardsBuyIn, trade, playerWithBiggestOffer);
 
-            game.addParty(party);
-            game.setPlayedParties(game.getPlayedParties() + 1);
+            if (!hasPlayerWon(players)) {
+                party.initParty(players);
+            }
+
+            for (Player player : players) {
+                player.setActiveTradeOffer(null);
+            }
 
             Map<Player, Scores> playerScoresMap = new HashMap<>();
 
@@ -78,9 +77,24 @@ public class Dealer {
             for (Player player : players) {
                 log.info(player + " has got scores:\n" + playerScoresMap.get(player));
             }
+
+            game.addParty(party);
+            game.setPlayedParties(game.getPlayedParties() + 1);
         }
 
         return game;
+    }
+
+    private boolean hasPlayerWon(Set<Player> players) {
+        int numberOfSkipPlayers = 0;
+
+        for (Player player : players) {
+            if (player.getActiveStatus() == StatusInParty.SKIPPER) {
+                numberOfSkipPlayers++;
+            }
+        }
+
+        return numberOfSkipPlayers == 2;
     }
 
     private Scores createScores(Set<Player> players, Player playerWhoNeedsScores) {

@@ -1,4 +1,4 @@
-package com.mycompany.preferans.game_with_attributes;
+package com.mycompany.preferans.game;
 
 import com.mycompany.preferans.subjects.Player;
 
@@ -14,7 +14,7 @@ public class Scores {
         whistPoints = new HashMap<>();
     }
 
-    public int getPoolPoints() {
+    int getPoolPoints() {
         return poolPoints;
     }
 
@@ -26,7 +26,7 @@ public class Scores {
         return whistPoints;
     }
 
-    public int getDumpPoints() {
+    int getDumpPoints() {
         return dumpPoints;
     }
 
@@ -39,8 +39,9 @@ public class Scores {
         StringBuilder s = new StringBuilder();
         s.append("      pool points: ").append(poolPoints).append("\n");
 
-        for (Player player : whistPoints.keySet()) {
-            s.append("      whists on ").append(player).append(" ").append(whistPoints.get(player)).append("\n");
+        for (Map.Entry<Player, Integer> playerAndWhists : whistPoints.entrySet()) {
+            s.append("      whists on ").append(playerAndWhists.getKey()).append(" ")
+                    .append(playerAndWhists.getValue()).append("\n");
         }
 
         s.append("      dump points: ").append(dumpPoints);

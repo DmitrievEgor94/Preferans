@@ -1,8 +1,8 @@
-package com.mycompany.preferans.game_with_attributes.schemes;
+package com.mycompany.preferans.game.schemes;
 
-import com.mycompany.preferans.game_with_attributes.Game;
-import com.mycompany.preferans.game_with_attributes.Party;
-import com.mycompany.preferans.game_with_attributes.Scores;
+import com.mycompany.preferans.game.Game;
+import com.mycompany.preferans.game.Party;
+import com.mycompany.preferans.game.Scores;
 import com.mycompany.preferans.subjects.Player;
 
 import java.util.Map;

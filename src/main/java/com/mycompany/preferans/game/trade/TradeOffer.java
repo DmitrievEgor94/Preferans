@@ -1,6 +1,8 @@
-package com.mycompany.preferans.game_with_attributes.trade_offers_and_trade;
+package com.mycompany.preferans.game.trade;
 
-import com.mycompany.preferans.game_with_attributes.card_and_deck.Card;
+import com.mycompany.preferans.game.deck.Card;
+
+import java.util.Objects;
 
 public class TradeOffer implements Comparable<TradeOffer> {
     private Card card;
@@ -47,6 +49,31 @@ public class TradeOffer implements Comparable<TradeOffer> {
         }
 
         return tradeOfferType.compareTo(o.tradeOfferType);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        TradeOffer tradeOffer = (TradeOffer) obj;
+
+        return Objects.equals(card, tradeOffer.card) &&
+                Objects.equals(tradeOfferType, tradeOffer.tradeOfferType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(card, tradeOfferType);
     }
 
     public Card getCard() {

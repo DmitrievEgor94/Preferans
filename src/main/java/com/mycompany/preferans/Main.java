@@ -1,12 +1,12 @@
 package com.mycompany.preferans;
 
-import com.mycompany.preferans.api_functions.ClassWithApiFunctions;
-import com.mycompany.preferans.game_with_attributes.Game;
-import com.mycompany.preferans.game_with_attributes.card_and_deck.Deck;
-import com.mycompany.preferans.game_with_attributes.schemes.Leningrad;
-import com.mycompany.preferans.game_with_attributes.schemes.Rostov;
-import com.mycompany.preferans.game_with_attributes.schemes.Scheme;
-import com.mycompany.preferans.game_with_attributes.schemes.Sochi;
+import com.mycompany.preferans.api.ClassWithApiFunctions;
+import com.mycompany.preferans.game.Game;
+import com.mycompany.preferans.game.deck.Deck;
+import com.mycompany.preferans.game.schemes.Leningrad;
+import com.mycompany.preferans.game.schemes.Rostov;
+import com.mycompany.preferans.game.schemes.Scheme;
+import com.mycompany.preferans.game.schemes.Sochi;
 import com.mycompany.preferans.subjects.Dealer;
 import com.mycompany.preferans.subjects.Player;
 import org.apache.log4j.Logger;
@@ -18,7 +18,7 @@ public class Main {
 
     private static final Logger log = Logger.getLogger(Main.class);
 
-    public static void play() {
+    private static void play() {
         Set<Player> players = new HashSet<>();
 
         log.info("Choose scheme of game(Sochi/Rostov/Leningrad):");
@@ -30,7 +30,7 @@ public class Main {
         scheme = getScheme(schemeName);
         if (scheme == null) return;
 
-        log.info("You have chosen " + scheme.getClass().getSimpleName()+".");
+        log.info("You have chosen " + scheme.getClass().getSimpleName() + ".");
 
         log.info("Choose number of parties to play:");
         int partiesToPlay = scanner.nextInt();
@@ -54,14 +54,15 @@ public class Main {
 
         List<Player> listOfPlayers = new ArrayList<>(players);
 
-        classWithApiFunctions.api1(1, "api1.txt",false);
+        classWithApiFunctions.api1(1, "api1.txt", false);
         classWithApiFunctions.api2(1, "api2.txt", false);
         classWithApiFunctions.api3(1, "api3.txt", false);
         classWithApiFunctions.api4(1, "api4.txt", false);
         classWithApiFunctions.api5(1, "api5.txt", false);
         classWithApiFunctions.api6(1, "api6.txt", false);
-        classWithApiFunctions.api7(1,"api7.txt", listOfPlayers.get(0),false);
-        classWithApiFunctions.api10(10, "api10.txt",false);
+        classWithApiFunctions.api7(1, "api7.txt", listOfPlayers.get(0), false);
+        classWithApiFunctions.api9(100, "api9.txt", listOfPlayers.get(0), false);
+        classWithApiFunctions.api10(10, "api10.txt", false);
     }
 
     private static Scheme getScheme(String schemeName) {
